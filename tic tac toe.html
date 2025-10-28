@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tic Tac Toe – Phòng chờ</title>
+  <style>
+    body {
+      background: linear-gradient(135deg, #74ebd5, #acb6e5);
+      font-family: "Segoe UI", sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    h1 {
+      color: white;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+      margin-bottom: 15px;
+    }
+
+    button {
+    background: linear-gradient(90deg, #ff512f, #f09819);
+    border: none;
+    color: white;
+    font-size: 15px;
+    border-radius: 10px;
+    padding: 10px 18px;
+    margin: 6px;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    transition: 0.3s;
+    }
+
+    button:hover {
+      background: #0056b3;
+    }
+
+    /* 📱 Responsive board */
+    #board {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(70px, 25vw));
+      grid-template-rows: repeat(3, minmax(70px, 25vw));
+      gap: 10px;
+      justify-content: center;
+      margin: 20px 0;
+    }
+
+    .cell {
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+      font-size: 8vw;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: 0.3s;
+      user-select: none;
+    }
+
+    .cell:hover {
+      background: #e3e3e3;
+      transform: scale(1.05);
+    }
+
+    .win {
+      background: #4CAF50 !important;
+      color: white;
+      animation: glow 0.8s infinite alternate;
+    }
+
+    @keyframes glow {
+      from { box-shadow: 0 0 10px #4CAF50; }
+      to { box-shadow: 0 0 25px #8cff8c; }
+    }
+
+    #status {
+      font-size: 18px;
+      color: #333;
+      margin-bottom: 10px;
+    }
+
+    /* 🎉 Popup chúc mừng */
+    #popup {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.6);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 10;
+    }
+
+    .popup-content {
+      background: white;
+      padding: 30px 40px;
+      border-radius: 15px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.3);
+      text-align: center;
+      animation: popup 0.4s ease;
+    }
+
+    @keyframes popup {
+      from { transform: scale(0.5); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .hidden { display: none; }
+
+    /* 🌈 Phòng chờ */
+    #menu {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    #menu button {
+      width: 200px;
+      font-size: 18px;
+    }
+  /* 🎨 Khung điều khoản */
+  #credits-box {
+    margin-top: 10px;
+    max-width: 350px;
+    background: linear-gradient(135deg, #ff0000, #ff7a00, #ffcc00);
+    color: #fff;
+    padding: 15px 20px;
+    border-radius: 15px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.25);
+    text-align: left;
+    font-size: 14px;
+    line-height: 1.5;
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+    transition: all 0.5s ease;
+  }
+
+  #credits-box.show {
+    max-height: 500px;
+    opacity: 1;
+  }
+
+  #credits-box h3 {
+    margin-top: 0;
+    margin-bottom: 5px;
+    font-size: 16px;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+  }
+
+  #credits-box p {
+    margin-top: 5px;
+    margin-bottom: 15px;
+  }
+
+  /* 🖲 Nút toggle */
+  #toggle-credits {
+    background: linear-gradient(90deg, #ff512f, #f09819);
+    border: none;
+    color: white;
+    font-size: 15px;
+    border-radius: 10px;
+    padding: 10px 18px;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    transition: 0.3s;
+  }
+
+  #toggle-credits:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 15px rgba(255, 204, 0, 0.6);
+  }
+  </style>
+</head>
+<body>
+
+  <!-- 🌈 PHÒNG CHỜ -->
+  <div id="menu">
+    <h1>Tic Tac Toe 🎮</h1>
+    <button onclick="startGame('ai')">Đấu với Máy 🤖</button>
+    <button onclick="startGame('friend')">Đấu với Bạn bè</button>
+<!-- 🌈 Nút mở điều khoản -->
+<button id="toggle-credits">📜 Xem điều khoản & credit</button>
+
+<!-- 📜 Hộp điều khoản & credit -->
+<div id="credits-box">
+  <h3>📜 Điều khoản sử dụng</h3>
+  <p>✓Trò chơi này được tạo nhằm mục đích giải trí.</p>
+  <p>✓Người chơi đồng ý rằng mọi dữ liệu trong trò chơi sẽ không được thu thập hoặc lưu trữ.</p>
+  <p>✓Có lỗi phát sinh,hãy liên hệ qua messenger nhé!</p>
+
+  <h3>💡 Credit</h3>
+  <p>
+    Làm bởi <b>Khangbo84-Nguyen Hoang Phuc</b>.<br>
+  </p>
+</div>
+  </div>
+
+  <!-- 🎯 GAME -->
+  <div id="game" class="hidden">
+    <h1>Tic Tac Toe</h1>
+    <div id="board"></div>
+    <div id="status"></div>
+    <button onclick="resetGame()">🔁 Chơi lại</button>
+    <button onclick="backToMenu()">🏠 Về phòng chờ</button>
+  </div>
+
+  <!-- 🎉 POPUP -->
+  <div id="popup">
+    <div class="popup-content">
+      <h2 id="popupMessage"></h2>
+      <button onclick="closePopup()">OK</button>
+    </div>
+  </div>
+
+  <script>
+ const toggleBtn = document.getElementById("toggle-credits");
+  const creditsBox = document.getElementById("credits-box");
+
+  toggleBtn.addEventListener("click", () => {
+    creditsBox.classList.toggle("show");
+    toggleBtn.textContent = creditsBox.classList.contains("show")
+      ? "❌ Ẩn điều khoản & credit"
+      : "📜 Xem điều khoản & credit";
+  });
+    const menu = document.getElementById("menu");
+    const game = document.getElementById("game");
+    const board = document.getElementById("board");
+    const statusText = document.getElementById("status");
+    const popup = document.getElementById("popup");
+    const popupMessage = document.getElementById("popupMessage");
+
+    let cells = [];
+    let mode = ""; // 'ai' hoặc 'friend'
+    let currentPlayer = "X";
+    let gameOver = false;
+
+    // 🔹 Tạo bảng cờ
+    for (let i = 0; i < 9; i++) {
+      const cell = document.createElement("div");
+      cell.classList.add("cell");
+      cell.addEventListener("click", () => handleClick(i));
+      board.appendChild(cell);
+      cells.push(cell);
+    }
+
+    function startGame(selectedMode) {
+      mode = selectedMode;
+      menu.classList.add("hidden");
+      game.classList.remove("hidden");
+      resetGame();
+    }
+
+    function backToMenu() {
+      game.classList.add("hidden");
+      menu.classList.remove("hidden");
+      resetGame();
+    }
+
+    function handleClick(i) {
+      if (gameOver || cells[i].textContent !== "") return;
+      cells[i].textContent = currentPlayer;
+
+      if (checkWin(currentPlayer)) return endGame(`🎉 ${currentPlayer} thắng!`);
+      if (isFull()) return endGame("😐 Hòa rồi!");
+
+      if (mode === "friend") {
+        currentPlayer = currentPlayer === "X" ? "O" : "X";
+        statusText.innerHTML = `Lượt của <b>${currentPlayer}</b>`;
+      } else if (mode === "ai") {
+        currentPlayer = "O";
+        statusText.innerHTML = "Lượt của máy (<b>O</b>)...";
+        setTimeout(aiMove, 400);
+      }
+    }
+
+    // 🤖 Máy đánh
+    function aiMove() {
+      if (gameOver) return;
+      const empty = cells.map((c, i) => (c.textContent === "" ? i : null)).filter(i => i !== null);
+      let move = findBestMove("O") || findBestMove("X") || empty[Math.floor(Math.random() * empty.length)];
+      cells[move].textContent = "O";
+
+      if (checkWin("O")) return endGame("🤖 Máy thắng!");
+      if (isFull()) return endGame("😐 Hòa rồi!");
+
+      currentPlayer = "X";
+      statusText.innerHTML = "Lượt của bạn (<b>X</b>)";
+    }
+
+    // ✅ Kiểm tra thắng
+    function checkWin(player) {
+      const wins = [
+        [0,1,2],[3,4,5],[6,7,8],
+        [0,3,6],[1,4,7],[2,5,8],
+        [0,4,8],[2,4,6]
+      ];
+      for (let combo of wins) {
+        if (combo.every(i => cells[i].textContent === player)) {
+          combo.forEach(i => cells[i].classList.add("win"));
+          return true;
+        }
+      }
+      return false;
+    }
+
+    function isFull() {
+      return cells.every(c => c.textContent !== "");
+    }
+
+    // 🔍 AI tìm nước thắng hoặc chặn
+    function findBestMove(player) {
+      const wins = [
+        [0,1,2],[3,4,5],[6,7,8],
+        [0,3,6],[1,4,7],[2,5,8],
+        [0,4,8],[2,4,6]
+      ];
+      for (let combo of wins) {
+        const marks = combo.map(i => cells[i].textContent);
+        if (marks.filter(m => m === player).length === 2 && marks.includes("")) {
+          return combo[marks.indexOf("")];
+        }
+      }
+      return null;
+    }
+
+    // 🎉 Kết thúc
+    function endGame(msg) {
+      popupMessage.textContent = msg;
+      popup.style.display = "flex";
+      gameOver = true;
+    }
+
+    function closePopup() {
+      popup.style.display = "none";
+    }
+
+    // 🔁 Reset
+    function resetGame() {
+      cells.forEach(c => {
+        c.textContent = "";
+        c.classList.remove("win");
+      });
+      currentPlayer = "X";
+      gameOver = false;
+      statusText.innerHTML = mode === "ai"
+        ? "Lượt của bạn (<b>X</b>)"
+        : "Lượt của <b>X</b>";
+      popup.style.display = "none";
+    }
+  </script>
+</body>
+</html>
