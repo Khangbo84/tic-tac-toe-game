@@ -165,26 +165,38 @@
       transform: scale(1.05);
       box-shadow: 0 0 15px rgba(255, 204, 0, 0.6);
     }
-    #logo {
+    #logo-wrapper {
+  position: relative;
+  display: inline-block;
   width: 160px;
   height: 160px;
-  border-radius: 25px; /* Bo tròn nhẹ */
-  box-shadow: 0 0 20px rgba(0,0,0,0.2);
-  position: relative;
+  border-radius: 25px;
   overflow: hidden;
-  margin-bottom: 15px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.25);
   animation: logoFadeIn 1s ease;
 }
 
-/* Hiệu ứng lướt sáng */
-#logo::after {
+#logo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 25px;
+}
+
+/* Hiệu ứng loé sáng */
+#logo-wrapper::after {
   content: "";
   position: absolute;
   top: 0;
   left: -75%;
   width: 50%;
   height: 100%;
-  background: linear-gradient(120deg, rgba(255,255,255,0.2), rgba(255,255,255,0.6), rgba(255,255,255,0.2));
+  background: linear-gradient(
+    120deg,
+    rgba(255,255,255,0.2),
+    rgba(255,255,255,0.7),
+    rgba(255,255,255,0.2)
+  );
   transform: skewX(-25deg);
   animation: shine 3s infinite;
 }
@@ -195,7 +207,6 @@
   100% { left: 125%; }
 }
 
-/* Hiệu ứng xuất hiện mượt */
 @keyframes logoFadeIn {
   from { opacity: 0; transform: scale(0.8); }
   to { opacity: 1; transform: scale(1); }
@@ -207,7 +218,9 @@
   <!-- 🌈 PHÒNG CHỜ -->
   <div id="menu">
     <h1>Tic Tac Toe 🎮</h1>
-    <img id="logo" src="https://i.ibb.co/N2vJTmPD/icon.png" alt="icon" border="0">
+    <div id="logo-wrapper">
+  <img src="https://i.postimg.cc/cJyVH8tN/icon.png" id="logo">
+    </div>
     <button onclick="selectDifficulty()">Đấu với Máy 🤖</button>
     <div id="difficulty" class="hidden">
       <p>Chọn độ khó:</p>
